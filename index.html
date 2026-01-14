@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>¡Feliz Cumpleaños!</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Arial',sans-serif;background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);min-height:100vh;display:flex;justify-content:center;align-items:center;overflow:hidden;position:relative}
+.fireworks-bg{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1}
+.container{text-align:center;padding:20px;position:relative;z-index:10}
+h1{color:#fff;font-size:clamp(1.5rem,5vw,3rem);margin-bottom:30px;text-shadow:2px 2px 4px rgba(0,0,0,.3);animation:float 3s ease-in-out infinite}
+.launch-btn{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;padding:clamp(15px,4vw,20px) clamp(40px,8vw,60px);border-radius:50px;font-size:clamp(1.2rem,4vw,1.8rem);font-weight:bold;cursor:pointer;box-shadow:0 10px 30px rgba(102,126,234,.4);transition:all .3s;position:relative;overflow:hidden}
+.launch-btn:hover{transform:translateY(-5px);box-shadow:0 15px 40px rgba(102,126,234,.6)}
+.launch-btn:active{transform:translateY(0)}
+.sparkler{position:absolute;font-size:3rem;bottom:-100px;left:50%;transform:translateX(-50%);transition:all 1s cubic-bezier(0.68,-0.55,0.265,1.55);opacity:0;filter:drop-shadow(0 0 10px gold)}
+.sparkler.launch{bottom:100%;opacity:1}
+.message{color:#fff;font-size:clamp(1rem,4vw,1.3rem);margin-top:20px;font-weight:bold;text-shadow:1px 1px 2px rgba(0,0,0,.3);animation:pulse 2s infinite}
+.firework{position:absolute;pointer-events:none}
+.particle{position:absolute;width:8px;height:8px;border-radius:50%;box-shadow:0 0 10px currentColor}
+.letter-container{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0) rotateY(90deg);transform-style:preserve-3d;transition:all .8s cubic-bezier(0.68,-0.55,0.265,1.55);z-index:100;opacity:0;perspective:1000px}
+.letter-container.show{transform:translate(-50%,-50%) scale(1) rotateY(0deg);opacity:1}
+.letter{background:linear-gradient(to bottom,#fef5e7,#f9e79f);width:clamp(280px,90vw,450px);max-height:85vh;padding:clamp(30px,6vw,50px);border-radius:3px;box-shadow:0 20px 60px rgba(0,0,0,.5),inset 0 0 50px rgba(255,255,255,.1);position:relative;border:2px solid #d4af37;overflow-y:auto;overflow-x:hidden}
+.letter::-webkit-scrollbar{width:0;height:0}
+.letter:before{content:'';position:absolute;top:0;left:0;right:0;height:40px;background:repeating-linear-gradient(90deg,#d4af37 0,#d4af37 2px,transparent 2px,transparent 10px);border-radius:3px 3px 0 0}
+.letter-lines{position:absolute;top:60px;left:0;right:0;bottom:0;background:repeating-linear-gradient(transparent,transparent 29px,rgba(212,175,55,.1) 29px,rgba(212,175,55,.1) 30px);pointer-events:none}
+.stamp{position:absolute;top:20px;right:20px;width:clamp(40px,10vw,60px);height:clamp(40px,10vw,60px);border:3px solid #c0392b;border-radius:5px;background:#e74c3c;transform:rotate(15deg);display:flex;align-items:center;justify-content:center;font-size:clamp(1.2rem,3vw,1.8rem)}
+.letter-content{position:relative;z-index:2;padding-top:20px;padding-bottom:20px}
+.letter h2{color:#8b4513;margin-bottom:clamp(15px,4vw,25px);font-size:clamp(1.3rem,4vw,2rem);font-family:'Brush Script MT',cursive;text-align:center}
+.letter p{color:#5d4037;line-height:1.8;margin-bottom:clamp(12px,3vw,18px);font-size:clamp(0.9rem,3.5vw,1.1rem);text-align:justify;text-indent:30px;font-family:Georgia,serif}
+.signature-section{display:flex;align-items:center;justify-content:flex-end;gap:clamp(10px,3vw,20px);margin-top:clamp(20px,5vw,30px);flex-wrap:wrap}
+.signature-image{width:clamp(60px,15vw,100px);height:clamp(60px,15vw,100px);border-radius:50%;object-fit:cover;border:3px solid #d4af37;box-shadow:0 5px 15px rgba(0,0,0,.3)}
+.signature{text-align:right;font-style:italic;color:#8b4513;font-size:clamp(1rem,3.5vw,1.2rem);font-family:'Brush Script MT',cursive}
+.button-group{display:flex;gap:clamp(10px,3vw,15px);justify-content:center;margin-top:clamp(15px,4vw,25px);margin-bottom:20px;flex-wrap:wrap}
+.btn{color:#fff;border:none;padding:clamp(10px,3vw,15px) clamp(25px,6vw,40px);border-radius:25px;cursor:pointer;font-size:clamp(0.9rem,3vw,1.1rem);transition:all .3s;box-shadow:0 5px 15px rgba(0,0,0,.3)}
+.close-btn{background:linear-gradient(135deg,#667eea,#764ba2)}
+.close-btn:hover{background:linear-gradient(135deg,#764ba2,#667eea);transform:scale(1.05)}
+.extra-btn{background:linear-gradient(135deg,#f093fb,#f5576c);position:relative;animation:bounce 1s infinite;box-shadow:0 5px 20px rgba(245,87,108,.6)}
+.extra-btn:hover{background:linear-gradient(135deg,#f5576c,#f093fb);transform:scale(1.05);animation:none}
+.extra-btn:before{content:'';position:absolute;top:-5px;right:-5px;width:15px;height:15px;background:#ff6348;border-radius:50%;animation:pulse-dot 1.5s infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes pulse-dot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.3);opacity:.7}}
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);display:flex;justify-content:center;align-items:center;z-index:200;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal.show{opacity:1;pointer-events:all}
+.modal-content{background:#fff;padding:clamp(20px,5vw,40px);border-radius:20px;max-width:95%;width:800px;max-height:95vh;overflow-y:auto;position:relative;transform:scale(.8);transition:transform .3s;box-shadow:0 25px 50px rgba(0,0,0,.5)}
+.modal.show .modal-content{transform:scale(1)}
+.modal-image{width:100%;max-height:70vh;object-fit:contain;border-radius:10px;margin-bottom:20px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+.modal-close{position:absolute;top:10px;right:10px;background:#ff6348;color:#fff;border:none;width:35px;height:35px;border-radius:50%;cursor:pointer;font-size:1.2rem;font-weight:bold;transition:all .3s;box-shadow:0 3px 10px rgba(0,0,0,.3)}
+.modal-close:hover{background:#ff4757;transform:scale(1.1)}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
+@keyframes explode{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0}}
+</style>
+</head>
+<body>
+<div class="fireworks-bg" id="fireworksBg"></div>
+
+<div class="container">
+<h1>🎉 ¡Feliz Cumpleaños! 🎉</h1>
+<button class="launch-btn" id="launchBtn">¡Lanzar Bengala! ✨</button>
+<p class="message">¡Prepárate para la sorpresa!</p>
+<div class="sparkler" id="sparkler">✨</div>
+</div>
+
+<div class="letter-container" id="letterContainer">
+<div class="letter">
+<div class="stamp">🎂</div>
+<div class="letter-lines"></div>
+<div class="letter-content">
+<h2>🎉 Feliz cumpleaños, mi querida amiga Valeria, alias 'Vale 🎂🥳</h2>
+<p>En este día tan especial te hice este pequeño detalle con mucho cariño. Espero que te guste… y ojo, que incluye un regalo extra más adelante 😌🎁. Que te lo pases increíble el dia hoy,  que  cumplas muchos años más.</p>
+<p>Gracias por tantas risas, los momentos inolvidable, que no falten los dramas y chismes, las anécdotas y las carcajadas. Eres una persona increíble, única y un poquito loca (pero de la buena 😜), y muy especial para mí.</p>
+<p>Sigue adelante, sigue brillando y no cambies nunca, porque tu luz alegra a todos los que te rodean. Disfruta tu día al máximo, come mucho pastel y preocúpate mañana. Hoy se celebra. 🎂✨</p>
+<p>P.D.: Aún te debo tus papas gajo… solo dime cuándo ya no estés a dieta (estoy atento 👀🍟).</p>
+<p>P.D. de la P.D.: Cuando seas la futura esposa de Muichiro, me invitas a la boda y a la cena😂💍🍽️</p>
+<p >Con mucho cariño, de parte de tu querido amigo Josue</p>
+<div class="signature-section">
+<img src="imagenes/Muichiro (1).jpg" alt="Imagen" class="signature-image">
+<div class="signature">
+<p style="margin:0;line-height:1.6">¡Feliz Cumpleaños!</p>
+<p style="margin:0;line-height:1.6">futura esposa de Muichiro 🌹</p>
+</div>
+</div>
+</div>
+<div class="button-group">
+<button class="btn close-btn" onclick="closeCard()">Cerrar</button>
+<button class="btn extra-btn" onclick="openModal()">Extra 🎁</button>
+</div>
+</div>
+</div>
+
+<div class="modal" id="modal">
+<div class="modal-content">
+<button class="modal-close" onclick="closeModal()">×</button>
+<img src="imagenes/Muichiro_modal.png" alt="Extra" class="modal-image">
+<h2 style="text-align:center;color:#667eea;margin-bottom:15px">🎉 ¡Sorpresa Especial! 🎉</h2>
+<p style="text-align:center;color:#555;line-height:1.8">Que te lo pases increíble con tu futuro esposo "Muichiro".🎈</p>
+</div>
+</div>
+
+<script>
+const launchBtn=document.getElementById('launchBtn');
+const sparkler=document.getElementById('sparkler');
+const letterContainer=document.getElementById('letterContainer');
+const modal=document.getElementById('modal');
+const fireworksBg=document.getElementById('fireworksBg');
+let clicked=false;
+let bgInterval;
+
+const colors=['#ff6b9d','#feca57','#48dbfb','#ff6348','#5f27cd','#1dd1a1','#f368e0','#ff9ff3','#54a0ff','#00d2d3'];
+
+function createFirework(x,y){
+const fw=document.createElement('div');
+fw.className='firework';
+fw.style.left=x+'px';
+fw.style.top=y+'px';
+fireworksBg.appendChild(fw);
+
+for(let i=0;i<35;i++){
+const particle=document.createElement('div');
+particle.className='particle';
+const angle=Math.random()*Math.PI*2;
+const velocity=80+Math.random()*120;
+const tx=Math.cos(angle)*velocity;
+const ty=Math.sin(angle)*velocity;
+particle.style.setProperty('--tx',tx+'px');
+particle.style.setProperty('--ty',ty+'px');
+particle.style.color=colors[Math.floor(Math.random()*colors.length)];
+particle.style.animation=`explode ${.8+Math.random()*.4}s ease-out forwards`;
+fw.appendChild(particle);
+}
+
+setTimeout(()=>fw.remove(),1500);
+}
+
+function startBackgroundFireworks(){
+bgInterval=setInterval(()=>{
+createFirework(
+Math.random()*window.innerWidth,
+Math.random()*window.innerHeight*0.6
+);
+},800);
+}
+
+launchBtn.addEventListener('click',()=>{
+if(!clicked){
+clicked=true;
+sparkler.classList.add('launch');
+startBackgroundFireworks();
+
+setTimeout(()=>{
+for(let i=0;i<6;i++){
+setTimeout(()=>{
+createFirework(
+Math.random()*window.innerWidth,
+Math.random()*window.innerHeight*0.5
+);
+},i*200);
+}
+},1000);
+
+setTimeout(()=>{
+letterContainer.classList.add('show');
+},2500);
+}
+});
+
+function closeCard(){
+letterContainer.classList.remove('show');
+clearInterval(bgInterval);
+setTimeout(()=>{
+sparkler.classList.remove('launch');
+clicked=false;
+},500);
+}
+
+function openModal(){
+modal.classList.add('show');
+}
+
+function closeModal(){
+modal.classList.remove('show');
+}
+</script>
+</body>
+</html>
